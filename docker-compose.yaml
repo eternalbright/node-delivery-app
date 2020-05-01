@@ -1,0 +1,49 @@
+version: '3'
+services:
+  nginx:
+    image: nginx:1.17.10-alpine
+    container_name: nginx
+    volumes:
+      - ./config/proxy.conf:/etc/nginx/conf.d/proxy.conf
+    depends_on:
+      - app
+    ports:
+      - "8080:8080"
+      - "5432:5432"
+    networks:
+      - default
+  app:
+    build: .
+    image: app
+    container_name: app
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - db
+    expose:
+      - "8080"
+#    external_links:
+#      - db:db
+    networks:
+      - default
+  db:
+    image: postgres:12.2-alpine
+    container_name: db
+    env_file:
+      - .env
+    expose:
+      - "5432"
+    ports:
+      - "1432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - default
+
+volumes:
+  db:
+
+networks:
+  default:
+    driver: bridge

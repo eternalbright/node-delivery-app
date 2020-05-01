@@ -1,0 +1,7 @@
+.*
+
+!.dockerignore
+!.env
+!.gitignore
+
+node_modules/

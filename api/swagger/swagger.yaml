@@ -1,0 +1,125 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Delivery app API
+host: localhost:8080
+basePath: /
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  '/customers':
+    get:
+      description: Get all customers
+      summary: Get customers
+      operationId: GetOperations
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            description: Reduces quantity of retrieved records
+
+      responses:
+        200:
+          description: Customers list
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      description: Create a new customer
+      summary: Create a customer
+      operationId: PostOperations
+      parameters:
+        - in: body
+          name: customer
+          description: The customer to create.
+          schema:
+            type: object
+            required:
+              - name
+              - city
+              - district
+              - address
+            properties:
+              name:
+                type: string
+                maximum: 30
+              city:
+                type: string
+                maximum: 30
+              district:
+                type: string
+                maximum: 30
+              address:
+                type: string
+                maximum: 50
+      responses:
+        200:
+          description: Customer created
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Body violates the pattern
+          content:
+            application/json:
+              schema:
+                type: object
+  '/couriers':
+    get:
+      description: Get all couriers
+      summary: Get couriers
+      operationId: GetOperations
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            description: Reduces quantity of retrieved records
+
+      responses:
+        200:
+          description: Couriers list
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      description: Create a new courier
+      summary: Create a courier
+      operationId: PostOperations
+      parameters:
+        - in: body
+          name: courier
+          description: The courier to create.
+          schema:
+            type: object
+            required:
+              - name
+              - city
+            properties:
+              name:
+                type: string
+                maximum: 30
+              city:
+                type: string
+                maximum: 30
+      responses:
+        200:
+          description: Courier created
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Body violates the pattern
+          content:
+            application/json:
+              schema:
+                type: object
