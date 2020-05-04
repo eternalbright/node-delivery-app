@@ -3,8 +3,8 @@
 !.sequelizerc
 
 *.md
+*.sqlite3
 *.yaml
 
 coverage/
 node_modules/
-storage/

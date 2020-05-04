@@ -19,7 +19,7 @@ if (NODE_ENV === 'production')
 else
     connection = new Sequelize({
         dialect: 'sqlite',
-        storage: join('storage', `${NODE_ENV || 'development'}.sqlite`)
+        storage: join(`${NODE_ENV || 'development'}.sqlite`)
     });
 
 module.exports = connection;

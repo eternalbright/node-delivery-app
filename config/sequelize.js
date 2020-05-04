@@ -2,12 +2,12 @@ const { join } = require('path');
 
 module.exports = {
     development: {
-        storage: join('storage', 'development.sqlite'),
+        storage: join('development.sqlite'),
         dialect: 'sqlite',
         logging: true
     },
     test: {
-        storage: join('storage', 'test.sqlite'),
+        storage: join('test.sqlite'),
         dialect: 'sqlite'
     },
     production: {
