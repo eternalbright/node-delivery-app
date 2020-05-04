@@ -7,21 +7,10 @@ module.exports = {
                 autoIncrement: true,
                 primaryKey: true
             },
-            customerId: {
-                type: Sequelize.INTEGER,
-                allowNull: false
-            },
-            courierId: {
-                type: Sequelize.INTEGER,
-                allowNull: false
-            },
-            cost: {
-                type: Sequelize.INTEGER,
-                allowNull: false
-            },
             city: {
                 type: Sequelize.STRING(30),
-                allowNull: false
+                allowNull: false,
+                noUpdate: true
             },
             district: {
                 type: Sequelize.STRING(30),
@@ -30,6 +19,33 @@ module.exports = {
             address: {
                 type: Sequelize.STRING(50),
                 allowNull: false
+            },
+            customerId: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                noUpdate: true
+            },
+            courierId: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                noUpdate: true
+            },
+            restaurantId: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                noUpdate: true
+            },
+            cost: {
+                type: Sequelize.INTEGER,
+                allowNull: false
+            },
+            isDelivered: {
+                type: Sequelize.BOOLEAN,
+                allowNull: false
+            },
+            deliveredAt: {
+                type: Sequelize.DATE,
+                noUpdate: true
             },
             createdAt: Sequelize.DATE,
             updatedAt: Sequelize.DATE

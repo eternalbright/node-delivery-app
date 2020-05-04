@@ -1,98 +1,135 @@
 const { Router } = require('express');
 
-const Customer = require('../models/Customer');
+const { Customer, Order } = require('../models/define');
+const { common, getAll, post, put } = require('../schemas/customer');
 
 const router = Router();
 
-router.get('/', async (req, res) => {
-    const customers = await Customer.findAll({ order: [['id', 'ASC']] });
+router.get('/', getAll, async (req, res) => {
+    const { page, limit } = req.query;
 
-    res.json(customers);
-});
+    const offset = page || 0;
+    const size = limit || 20;
 
-router.get('/:id', (req, res) => {
-    const { id } = req.params;
+    const errorHandler = (err) =>
+        res.status(500).json({
+            status: 'GetCustomersError',
+            message: err
+        });
 
-    Customer.findByPk(id)
-        .then((customer) => res.json(customer))
-        .catch(() =>
-            res.status(404).json({
-                status: 'CustomerNotFound',
-                id
-            })
-        );
-});
+    const { count } = await Customer.findAndCountAll().catch((err) =>
+        errorHandler(err)
+    );
 
-router.post('/', (req, res) =>
-    Customer.create(req.body, {
-        field: ['name', 'city', 'district', 'address']
+    if (!count)
+        res.json({
+            result: [],
+            count: count,
+            pages: Math.ceil(count / size)
+        });
+
+    Customer.findAll({
+        offset: size * (offset - 1),
+        limit,
+        order: [['id', 'ASC']]
     })
-        .then((customer) =>
+        .then((customers) =>
             res.json({
-                status: 'CustomerCreated',
-                ...customer.dataValues
+                result: customers,
+                count: count,
+                pages: Math.ceil(count / size)
             })
         )
-        .catch((err) => {
-            const statusCode = err.message.includes('Validation') ? 400 : 500;
-
-            res.status(statusCode).json({
-                status: 'CustomerCreationError',
-                message: err.errors[0].message
-            });
-        })
-);
-
-router.patch('/:id', async (req, res) => {
-    const { id } = req.params;
-
-    const customer = await Customer.findByPk(id);
-
-    if (!customer) {
-        res.status(404).json({
-            status: 'CustomerNotFound',
-            id
-        });
-    } else {
-        customer
-            .update(req.body)
-            .then((updatedCustomer) =>
-                res.json({
-                    status: 'CustomerUpdated',
-                    ...updatedCustomer.dataValues
-                })
-            )
-            .catch((err) => {
-                const statusCode = err.message.includes('Validation')
-                    ? 400
-                    : 500;
-
-                res.status(statusCode).json({
-                    status: 'CustomerUpdatingError',
-                    message: err.errors[0].message
-                });
-            });
-    }
+        .catch((err) => errorHandler(err));
 });
 
-router.delete('/:id', async (req, res) => {
+router.get('/:id', common, async (req, res) => {
     const { id } = req.params;
 
-    const customer = await Customer.findByPk(id);
+    const customer = await Customer.findByPk(id, {
+        include: [{ model: Order, as: 'Orders' }]
+    }).catch((err) =>
+        res.status(500).json({
+            status: 'GetCustomerByIdError',
+            message: err
+        })
+    );
 
-    if (!customer) {
+    if (!customer)
         res.status(404).json({
             status: 'CustomerNotFound',
-            id
+            id: parseInt(id)
         });
-    } else {
-        customer.destroy();
 
-        res.json({
-            status: 'CustomerDeleted',
-            id
+    res.json(customer);
+});
+
+router.post('/', post, async (req, res) => {
+    const customer = await Customer.create(req.body).catch((err) =>
+        res.status(500).json({
+            status: 'CustomerCreationError',
+            message: err
+        })
+    );
+
+    res.json({
+        status: 'CustomerCreated',
+        ...customer.dataValues
+    });
+});
+
+router.put('/:id', put, async (req, res) => {
+    const { id } = req.params;
+
+    const errorHandler = (err) =>
+        res.status(500).json({
+            status: 'CustomerUpdatingError',
+            message: err
         });
-    }
+
+    const customer = await Customer.findByPk(id).catch((err) =>
+        errorHandler(err)
+    );
+
+    if (!customer)
+        res.status(404).json({
+            status: 'CustomerNotFound',
+            id: parseInt(id)
+        });
+
+    customer
+        .update(req.body)
+        .then((updatedCustomer) =>
+            res.json({
+                status: 'CustomerUpdated',
+                ...updatedCustomer.dataValues
+            })
+        )
+        .catch((err) => errorHandler(err));
+});
+
+router.delete('/:id', common, async (req, res) => {
+    const { id } = req.params;
+
+    const customer = await Customer.findByPk(id).catch((err) =>
+        res.status(500).json({
+            status: 'CustomerDeletionError',
+            message: err
+        })
+    );
+
+    if (!customer)
+        res.status(404).json({
+            status: 'CustomerNotFound',
+            id: parseInt(id)
+        });
+
+    await customer.destroy();
+
+    res.json({
+        status: 'CustomerDeleted',
+        ...customer.dataValues
+    });
 });
 
 module.exports = router;

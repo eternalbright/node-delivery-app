@@ -1,0 +1,39 @@
+{
+    "extends": [
+        "eslint:recommended",
+        "plugin:jest/recommended"
+    ],
+    "plugins": [ "jest" ],
+    "parserOptions": {
+        "ecmaVersion": 10,
+        "sourceType": "module",
+    },
+    "env": {
+        "es6": true,
+        "node": true,
+        "jest/globals": true
+    },
+    "rules": {
+        "comma-dangle": 0,
+        "max-len": [
+            "error",
+            {
+                "code": 120,
+                "ignoreComments": true,
+                "ignoreUrls": true,
+                "ignoreStrings": true
+            }
+        ],
+        "no-unused-vars": [
+            "error",
+            {
+                "argsIgnorePattern": "next"
+            }
+        ],
+        "jest/no-disabled-tests": "warn",
+        "jest/no-focused-tests": "error",
+        "jest/no-identical-title": "error",
+        "jest/prefer-to-have-length": "warn",
+        "jest/valid-expect": "error"
+    }
+}

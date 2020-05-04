@@ -2,6 +2,11 @@
 
 !.dockerignore
 !.env
+!.eslintrc
 !.gitignore
+!.prettierrc
+!.sequelizerc
 
+coverage/
 node_modules/
+storage/

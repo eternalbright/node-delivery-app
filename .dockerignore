@@ -1,6 +1,10 @@
 .*
 
+!.sequelizerc
+
 *.md
 *.yaml
 
+coverage/
 node_modules/
+storage/

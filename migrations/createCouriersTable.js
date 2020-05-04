@@ -15,16 +15,8 @@ module.exports = {
                 type: Sequelize.STRING(30),
                 allowNull: false
             },
-            ordersCount: {
-                type: Sequelize.INTEGER,
-                allowNull: false
-            },
-            ordersCost: {
-                type: Sequelize.INTEGER,
-                allowNull: false
-            },
-            averageDeliveryTime: {
-                type: Sequelize.INTEGER,
+            isDelivering: {
+                type: Sequelize.BOOLEAN,
                 allowNull: false
             },
             createdAt: Sequelize.DATE,

@@ -9,47 +9,17 @@ const Courier = sequelize.define('courier', {
         primaryKey: true
     },
     name: {
-        type: DataTypes.STRING(30),
-        allowNull: false,
-        validate: {
-            notNull: {
-                args: true,
-                msg: 'A name should be specified'
-            },
-            isAlpha: {
-                args: true,
-                msg: 'A name should be a string literal'
-            }
-        }
+        type: DataTypes.STRING(50),
+        allowNull: false
     },
     city: {
-        type: DataTypes.STRING(30),
-        allowNull: false,
-        validate: {
-            notNull: {
-                args: true,
-                msg: 'A city should be specified'
-            },
-            isAlpha: {
-                args: true,
-                msg: 'A city should be a string literal'
-            }
-        }
+        type: DataTypes.STRING(50),
+        allowNull: false
     },
-    ordersCount: {
-        type: DataTypes.INTEGER,
+    isDelivering: {
+        type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: 0
-    },
-    ordersCost: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0
-    },
-    averageDeliveryTime: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        defaultValue: 0
+        defaultValue: false
     }
 });
 

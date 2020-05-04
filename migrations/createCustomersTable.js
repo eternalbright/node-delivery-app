@@ -15,14 +15,6 @@ module.exports = {
                 type: Sequelize.STRING(30),
                 allowNull: false
             },
-            district: {
-                type: Sequelize.STRING(30),
-                allowNull: false
-            },
-            address: {
-                type: Sequelize.STRING(50),
-                allowNull: false
-            },
             createdAt: Sequelize.DATE,
             updatedAt: Sequelize.DATE
         }),
