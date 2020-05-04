@@ -27,20 +27,20 @@ router.get('/', getAll, async (req, res) => {
             count: count,
             pages: Math.ceil(count / size)
         });
-
-    Restaurant.findAll({
-        offset: size * (offset - 1),
-        limit: size,
-        order: [['id', 'ASC']]
-    })
-        .then((restaurants) =>
-            res.json({
-                result: restaurants,
-                count: count,
-                pages: Math.ceil(count / size)
-            })
-        )
-        .catch((err) => errorHandler(err));
+    else
+        Restaurant.findAll({
+            offset: size * (offset - 1),
+            limit: size,
+            order: [['id', 'ASC']]
+        })
+            .then((restaurants) =>
+                res.json({
+                    result: restaurants,
+                    count: count,
+                    pages: Math.ceil(count / size)
+                })
+            )
+            .catch((err) => errorHandler(err));
 });
 
 router.get('/:id', common, async (req, res) => {
@@ -60,23 +60,24 @@ router.get('/:id', common, async (req, res) => {
             status: 'RestaurantNotFound',
             id: parseInt(id)
         });
-
-    res.json(restaurant);
+    else res.json(restaurant);
 });
 
-router.post('/', post, async (req, res) => {
-    const restaurant = await Restaurant.create(req.body).catch((err) =>
-        res.status(500).json({
-            status: 'RestaurantCreationError',
-            message: err
-        })
-    );
-
-    res.json({
-        status: 'RestaurantCreated',
-        ...restaurant.dataValues
-    });
-});
+router.post('/', post, (req, res) =>
+    Restaurant.create(req.body)
+        .then((restaurant) =>
+            res.json({
+                status: 'RestaurantCreated',
+                ...restaurant.dataValues
+            })
+        )
+        .catch((err) =>
+            res.status(500).json({
+                status: 'RestaurantCreationError',
+                message: err
+            })
+        )
+);
 
 router.put('/:id', put, async (req, res) => {
     const { id } = req.params;
@@ -96,16 +97,16 @@ router.put('/:id', put, async (req, res) => {
             status: 'RestaurantNotFound',
             id: parseInt(id)
         });
-
-    restaurant
-        .update(req.body)
-        .then((updatedRestaurant) =>
-            res.json({
-                status: 'RestaurantUpdated',
-                ...updatedRestaurant.dataValues
-            })
-        )
-        .catch((err) => errorHandler(err));
+    else
+        restaurant
+            .update(req.body)
+            .then((updatedRestaurant) =>
+                res.json({
+                    status: 'RestaurantUpdated',
+                    ...updatedRestaurant.dataValues
+                })
+            )
+            .catch((err) => errorHandler(err));
 });
 
 router.delete('/:id', common, async (req, res) => {
@@ -123,13 +124,14 @@ router.delete('/:id', common, async (req, res) => {
             status: 'RestaurantNotFound',
             id: parseInt(id)
         });
+    else {
+        await restaurant.destroy();
 
-    await restaurant.destroy();
-
-    res.json({
-        status: 'RestaurantDeleted',
-        ...restaurant.dataValues
-    });
+        res.json({
+            status: 'RestaurantDeleted',
+            ...restaurant.dataValues
+        });
+    }
 });
 
 module.exports = router;

@@ -5,7 +5,6 @@ case $1 in
         NODE_ENV=test npm run drop
         NODE_ENV=test npm run migration
         NODE_ENV=test jest --collectCoverage --forceExit || true
-        NODE_ENV=test npm run drop
     ;;
 
     prod)

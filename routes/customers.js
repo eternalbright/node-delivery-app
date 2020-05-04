@@ -27,20 +27,20 @@ router.get('/', getAll, async (req, res) => {
             count: count,
             pages: Math.ceil(count / size)
         });
-
-    Customer.findAll({
-        offset: size * (offset - 1),
-        limit: size,
-        order: [['id', 'ASC']]
-    })
-        .then((customers) =>
-            res.json({
-                result: customers,
-                count: count,
-                pages: Math.ceil(count / size)
-            })
-        )
-        .catch((err) => errorHandler(err));
+    else
+        Customer.findAll({
+            offset: size * (offset - 1),
+            limit: size,
+            order: [['id', 'ASC']]
+        })
+            .then((customers) =>
+                res.json({
+                    result: customers,
+                    count: count,
+                    pages: Math.ceil(count / size)
+                })
+            )
+            .catch((err) => errorHandler(err));
 });
 
 router.get('/:id', common, async (req, res) => {
@@ -60,23 +60,24 @@ router.get('/:id', common, async (req, res) => {
             status: 'CustomerNotFound',
             id: parseInt(id)
         });
-
-    res.json(customer);
+    else res.json(customer);
 });
 
-router.post('/', post, async (req, res) => {
-    const customer = await Customer.create(req.body).catch((err) =>
-        res.status(500).json({
-            status: 'CustomerCreationError',
-            message: err
-        })
-    );
-
-    res.json({
-        status: 'CustomerCreated',
-        ...customer.dataValues
-    });
-});
+router.post('/', post, (req, res) =>
+    Customer.create(req.body)
+        .then((customer) =>
+            res.json({
+                status: 'CustomerCreated',
+                ...customer.dataValues
+            })
+        )
+        .catch((err) =>
+            res.status(500).json({
+                status: 'CustomerCreationError',
+                message: err
+            })
+        )
+);
 
 router.put('/:id', put, async (req, res) => {
     const { id } = req.params;
@@ -96,16 +97,16 @@ router.put('/:id', put, async (req, res) => {
             status: 'CustomerNotFound',
             id: parseInt(id)
         });
-
-    customer
-        .update(req.body)
-        .then((updatedCustomer) =>
-            res.json({
-                status: 'CustomerUpdated',
-                ...updatedCustomer.dataValues
-            })
-        )
-        .catch((err) => errorHandler(err));
+    else
+        customer
+            .update(req.body)
+            .then((updatedCustomer) =>
+                res.json({
+                    status: 'CustomerUpdated',
+                    ...updatedCustomer.dataValues
+                })
+            )
+            .catch((err) => errorHandler(err));
 });
 
 router.delete('/:id', common, async (req, res) => {
@@ -123,13 +124,14 @@ router.delete('/:id', common, async (req, res) => {
             status: 'CustomerNotFound',
             id: parseInt(id)
         });
+    else {
+        await customer.destroy();
 
-    await customer.destroy();
-
-    res.json({
-        status: 'CustomerDeleted',
-        ...customer.dataValues
-    });
+        res.json({
+            status: 'CustomerDeleted',
+            ...customer.dataValues
+        });
+    }
 });
 
 module.exports = router;

@@ -28,20 +28,20 @@ router.get('/', getAll, async (req, res) => {
             count: count,
             pages: Math.ceil(count / size)
         });
-
-    Order.findAll({
-        offset: size * (offset - 1),
-        limit: size,
-        order: [['id', 'ASC']]
-    })
-        .then((orders) =>
-            res.json({
-                result: orders,
-                count: count,
-                pages: Math.ceil(count / size)
-            })
-        )
-        .catch((err) => errorHandler(err));
+    else
+        Order.findAll({
+            offset: size * (offset - 1),
+            limit: size,
+            order: [['id', 'ASC']]
+        })
+            .then((orders) =>
+                res.json({
+                    result: orders,
+                    count: count,
+                    pages: Math.ceil(count / size)
+                })
+            )
+            .catch((err) => errorHandler(err));
 });
 
 router.get('/:id', common, async (req, res) => {
@@ -65,8 +65,7 @@ router.get('/:id', common, async (req, res) => {
             status: 'OrderNotFound',
             id: parseInt(id)
         });
-
-    res.json(order);
+    else res.json(order);
 });
 
 router.post('/', post, async (req, res) => {
@@ -85,42 +84,48 @@ router.post('/', post, async (req, res) => {
 
     if (!customer)
         res.status(404).json({
-            status: 'CustomerNotFound',
+            status: 'OrderCreationError',
             message: `Unable to make order in city "${city}"`,
             id: customerId
         });
+    else {
+        const restaurant = await Restaurant.findOne({
+            where: { id: restaurantId, city: city }
+        }).catch((err) => errorHandler(err));
 
-    const courier = await Courier.findOne({
-        where: { city: city, isDelivering: false },
-        order: [Sequelize.fn('RANDOM')]
-    }).catch((err) => errorHandler(err));
+        if (!restaurant)
+            res.status(404).json({
+                status: 'OrderCreationError',
+                message: `The restaurant does not exist in city "${city}"`
+            });
+        else {
+            const courier = await Courier.findOne({
+                where: { city: city, isDelivering: false },
+                order: [Sequelize.fn('RANDOM')]
+            });
 
-    if (!courier)
-        res.status(404).json({
-            status: 'CourierNotFound',
-            message: `No couriers available in city "${city}"`
-        });
-    else body.courierId = courier.id;
+            if (!courier)
+                res.status(404).json({
+                    status: 'OrderCreationError',
+                    message: `No couriers available in city "${city}"`
+                });
+            else {
+                body.courierId = courier.id;
 
-    const restaurant = await Restaurant.findOne({
-        where: { id: restaurantId, city: city }
-    }).catch((err) => errorHandler(err));
+                Order.create(body)
+                    .then(async (order) => {
+                        courier.isDelivering = true;
+                        await courier.save();
 
-    if (!restaurant)
-        res.status(404).json({
-            status: 'RestaurantNotFound',
-            message: `The restaurant does not exist in city "${city}"`
-        });
-
-    const order = await Order.create(body).catch((err) => errorHandler(err));
-
-    courier.isDelivering = true;
-    await courier.save();
-
-    res.json({
-        status: 'OrderCreated',
-        ...order.dataValues
-    });
+                        res.json({
+                            status: 'OrderCreated',
+                            ...order.dataValues
+                        });
+                    })
+                    .catch((err) => errorHandler(err));
+            }
+        }
+    }
 });
 
 router.put('/:id', put, async (req, res) => {
@@ -140,30 +145,31 @@ router.put('/:id', put, async (req, res) => {
             status: 'OrderNotFound',
             id: parseInt(id)
         });
-
-    const courier = await Courier.findOne({
-        where: { id: order.courierId }
-    }).catch((err) => errorHandler(err));
-
-    if (!body.isDelivered) body.isDelivered = order.isDelivered;
     else {
-        if (!order.isDelivered) {
-            courier.isDelivering = false;
-            await courier.save();
+        const courier = await Courier.findOne({
+            where: { id: order.courierId }
+        }).catch((err) => errorHandler(err));
 
-            body.deliveredAt = new Date();
+        if (!body.isDelivered) body.isDelivered = order.isDelivered;
+        else {
+            if (!order.isDelivered) {
+                courier.isDelivering = false;
+                await courier.save();
+
+                body.deliveredAt = new Date();
+            }
         }
-    }
 
-    order
-        .update(body)
-        .then((updatedOrder) =>
-            res.json({
-                status: 'OrderUpdated',
-                ...updatedOrder.dataValues
-            })
-        )
-        .catch((err) => errorHandler(err));
+        order
+            .update(body)
+            .then((updatedOrder) =>
+                res.json({
+                    status: 'OrderUpdated',
+                    ...updatedOrder.dataValues
+                })
+            )
+            .catch((err) => errorHandler(err));
+    }
 });
 
 router.delete('/:id', common, async (req, res) => {
@@ -181,22 +187,23 @@ router.delete('/:id', common, async (req, res) => {
             status: 'OrderNotFound',
             id: parseInt(id)
         });
+    else {
+        if (!order.isDelivered) {
+            const courier = await Courier.findOne({
+                where: { id: order.courierId }
+            });
 
-    if (!order.isDelivered) {
-        const courier = await Courier.findOne({
-            where: { id: order.courierId }
+            courier.isDelivering = false;
+            await courier.save();
+        }
+
+        await order.destroy();
+
+        res.json({
+            status: 'OrderDeleted',
+            ...order.dataValues
         });
-
-        courier.isDelivering = false;
-        await courier.save();
     }
-
-    await order.destroy();
-
-    res.json({
-        status: 'OrderDeleted',
-        ...order.dataValues
-    });
 });
 
 module.exports = router;

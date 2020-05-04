@@ -28,20 +28,20 @@ router.get('/', getAll, async (req, res) => {
             count: count,
             pages: Math.ceil(count / size)
         });
-
-    Courier.findAll({
-        offset: size * (offset - 1),
-        limit: size,
-        order: [['id', 'ASC']]
-    })
-        .then((couriers) =>
-            res.json({
-                result: couriers,
-                count: count,
-                pages: Math.ceil(count / size)
-            })
-        )
-        .catch((err) => errorHandler(err));
+    else
+        Courier.findAll({
+            offset: size * (offset - 1),
+            limit: size,
+            order: [['id', 'ASC']]
+        })
+            .then((couriers) =>
+                res.json({
+                    result: couriers,
+                    count: count,
+                    pages: Math.ceil(count / size)
+                })
+            )
+            .catch((err) => errorHandler(err));
 });
 
 router.get('/:id', common, async (req, res) => {
@@ -49,9 +49,6 @@ router.get('/:id', common, async (req, res) => {
 
     const courier = await Courier.findByPk(id, {
         include: [{ model: Order, as: 'Orders' }]
-        // attributes: {
-        //     include: [[Sequelize.fn('sum', Sequelize.col('Orders.id')), 'total']]
-        // },
     }).catch((err) =>
         res.status(500).json({
             status: 'GetCourierByIdError',
@@ -64,8 +61,7 @@ router.get('/:id', common, async (req, res) => {
             status: 'CourierNotFound',
             id: parseInt(id)
         });
-
-    res.json(courier);
+    else res.json(courier);
 });
 
 router.get('/:id/stats', common, async (req, res) => {
@@ -86,70 +82,73 @@ router.get('/:id/stats', common, async (req, res) => {
             status: 'CourierNotFound',
             id: parseInt(id)
         });
+    else {
+        const totalOrders =
+            (await Order.count({
+                where: { courierId: id }
+            }).catch((err) => errorHandler(err))) || 0;
 
-    const totalOrders =
-        (await Order.count({
-            where: { courierId: id }
-        }).catch((err) => errorHandler(err))) || 0;
+        const totalOrdersCost =
+            (await Order.sum('cost', {
+                where: { courierId: id, isDelivered: true }
+            }).catch((err) => errorHandler(err))) || 0;
 
-    const totalOrdersCost =
-        (await Order.sum('cost', {
-            where: { courierId: id, isDelivered: true }
-        }).catch((err) => errorHandler(err))) || 0;
+        const mostPopularDeliveryPoints = await Order.findAll({
+            where: { courierId: id },
+            attributes: [
+                'district',
+                'city',
+                [Sequelize.fn('COUNT', Sequelize.col('district')), 'count']
+            ],
+            group: ['district', 'city'],
+            order: [[Sequelize.col('count'), 'DESC']]
+        }).catch((err) => errorHandler(err));
 
-    const mostPopularDeliveryPoints = await Order.findAll({
-        where: { courierId: id },
-        attributes: [
-            'district',
-            'city',
-            [Sequelize.fn('COUNT', Sequelize.col('district')), 'count']
-        ],
-        group: ['district', 'city'],
-        order: [[Sequelize.col('count'), 'DESC']]
-    }).catch((err) => errorHandler(err));
+        const deliveryTime = await Order.findAll({
+            where: { courierId: id, deliveredAt: { [Op.ne]: null } },
+            attributes: ['createdAt', 'deliveredAt']
+        }).catch((err) => errorHandler(err));
 
-    const deliveryTime = await Order.findAll({
-        where: { courierId: id, deliveredAt: { [Op.ne]: null } },
-        attributes: ['createdAt', 'deliveredAt']
-    }).catch((err) => errorHandler(err));
+        const deliveryTimeAccumulator = deliveryTime.map((ts) => {
+            const { createdAt, deliveredAt } = ts.dataValues;
 
-    const deliveryTimeAccumulator = deliveryTime.map((ts) => {
-        const { createdAt, deliveredAt } = ts.dataValues;
+            return Math.floor(
+                (deliveredAt.getTime() - createdAt.getTime()) / 1000 / 60
+            );
+        });
 
-        return Math.floor(
-            (deliveredAt.getTime() - createdAt.getTime()) / 1000 / 60
-        );
-    });
+        const averageDeliveryTime =
+            Math.floor(
+                deliveryTimeAccumulator.reduce((acc, val) => acc + val, 0) /
+                    deliveryTimeAccumulator.length
+            ) || null;
 
-    const averageDeliveryTime =
-        Math.floor(
-            deliveryTimeAccumulator.reduce((acc, val) => acc + val, 0) /
-                deliveryTimeAccumulator.length
-        ).toString() + ' minute(s)';
-
-    res.json({
-        totalOrders,
-        totalOrdersCost,
-        averageDeliveryTime,
-        mostPopularDeliveryPoints
-    });
+        res.json({
+            totalOrders,
+            totalOrdersCost,
+            averageDeliveryTime,
+            mostPopularDeliveryPoints
+        });
+    }
 });
 
-router.post('/', post, async (req, res) => {
-    const courier = await Courier.create(req.body, {
+router.post('/', post, (req, res) =>
+    Courier.create(req.body, {
         field: ['name', 'city']
-    }).catch((err) =>
-        res.status(500).json({
-            status: 'CourierCreationError',
-            message: err
-        })
-    );
-
-    res.json({
-        status: 'CourierCreated',
-        ...courier.dataValues
-    });
-});
+    })
+        .then((courier) =>
+            res.json({
+                status: 'CourierCreated',
+                ...courier.dataValues
+            })
+        )
+        .catch((err) =>
+            res.status(500).json({
+                status: 'CourierCreationError',
+                message: err
+            })
+        )
+);
 
 router.put('/:id', put, async (req, res) => {
     const { id } = req.params;
@@ -170,16 +169,16 @@ router.put('/:id', put, async (req, res) => {
             status: 'CourierNotFound',
             id: parseInt(id)
         });
-
-    courier
-        .update(body)
-        .then((updatedCourier) =>
-            res.json({
-                status: 'CourierUpdated',
-                ...updatedCourier.dataValues
-            })
-        )
-        .catch((err) => errorHandler(err));
+    else
+        courier
+            .update(body)
+            .then((updatedCourier) =>
+                res.json({
+                    status: 'CourierUpdated',
+                    ...updatedCourier.dataValues
+                })
+            )
+            .catch((err) => errorHandler(err));
 });
 
 router.delete('/:id', common, async (req, res) => {
@@ -199,19 +198,19 @@ router.delete('/:id', common, async (req, res) => {
             status: 'CourierNotFound',
             id: parseInt(id)
         });
-
-    if (courier.isDelivering)
+    else if (courier.isDelivering)
         res.status(404).json({
             status: 'CourierDeletionError',
             message: 'Unable to delete the courier due to undelivered orders'
         });
+    else {
+        await courier.destroy();
 
-    await courier.destroy();
-
-    res.json({
-        status: 'CourierDeleted',
-        ...courier.dataValues
-    });
+        res.json({
+            status: 'CourierDeleted',
+            ...courier.dataValues
+        });
+    }
 });
 
 module.exports = router;
