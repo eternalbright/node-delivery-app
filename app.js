@@ -1,45 +1,52 @@
-const cookieParser = require('cookie-parser');
+const { errors } = require('celebrate');
 const cors = require('cors');
 const express = require('express');
 const helmet = require('helmet');
 const logger = require('morgan');
-const rateLimit = require('express-rate-limit');
+const swaggerUi = require('swagger-ui-express');
 
-const verifyRoute = require('./middlewares/verifyRoute');
-const verifyBody = require('./middlewares/verifyBody');
+const swaggerReference = require('./api/swagger/swagger.json');
+
+const rateLimit = require('./middlewares/rateLimit');
+const validateRoute = require('./middlewares/validateRoute');
+const validateBody = require('./middlewares/validateBody');
 
 const couriers = require('./routes/couriers');
 const customers = require('./routes/customers');
 const orders = require('./routes/orders');
 const restaurants = require('./routes/restaurants');
 
+const { API_VERSION, NODE_ENV, PORT } = process.env;
+
 const app = express();
-const port = process.env.PORT || 8080;
-
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100
-});
-
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'hbs');
+const apiVersion = API_VERSION || 'v1';
+const env = NODE_ENV || 'development';
+const port = PORT || 8080;
+const router = express.Router();
 
 app.use(logger('combined'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 app.use(cors());
 app.use(helmet());
-app.use(limiter);
+app.use(rateLimit);
 
-app.use('/couriers', couriers);
-app.use('/customers', customers);
-app.use('/orders', orders);
-app.use('/restaurants', restaurants);
+app.use(`/api/${apiVersion}`, cors(), router);
 
-app.use(verifyRoute);
-app.use(verifyBody);
+router.use(`/couriers`, couriers);
+router.use(`/customers`, customers);
+router.use(`/orders`, orders);
+router.use(`/restaurants`, restaurants);
+router.use(`/reference`, swaggerUi.serve, swaggerUi.setup(swaggerReference));
 
-app.listen(port, () => console.info(`Express started on port ${port}`));
+app.use(errors());
+app.use(validateRoute);
+app.use(validateBody);
+
+app.listen(port, () =>
+    console.info(
+        `Express started on port ${port} (env: "${env}", apiVersion: "${apiVersion}")`
+    )
+);
 
 module.exports = app;

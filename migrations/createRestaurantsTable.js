@@ -8,11 +8,15 @@ module.exports = {
                 primaryKey: true
             },
             name: {
-                type: Sequelize.STRING(30),
+                type: Sequelize.STRING(50),
                 allowNull: false,
-                unique: true
+                noUpdate: true
             },
             city: {
+                type: Sequelize.STRING(30),
+                allowNull: false
+            },
+            district: {
                 type: Sequelize.STRING(30),
                 allowNull: false
             },

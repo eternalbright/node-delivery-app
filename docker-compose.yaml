@@ -19,6 +19,10 @@ services:
     restart: always
     env_file:
       - .env
+    environment:
+      API_VERSION: "v1"
+      NODE_ENV: "production"
+      PORT: "8080"
     depends_on:
       - db
     expose:

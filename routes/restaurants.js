@@ -1,98 +1,135 @@
 const { Router } = require('express');
 
-const Restaurant = require('../models/Restaurant');
+const { Order, Restaurant } = require('../models/define');
+const { common, getAll, post, put } = require('../schemas/restaurant');
 
 const router = Router();
 
-router.get('/', async (req, res) => {
-    const restaurants = await Restaurant.findAll({ order: [['id', 'ASC']] });
+router.get('/', getAll, async (req, res) => {
+    const { page, limit } = req.query;
 
-    res.json(restaurants);
-});
+    const offset = page || 0;
+    const size = limit || 20;
 
-router.get('/:id', (req, res) => {
-    const { id } = req.params;
+    const errorHandler = (err) =>
+        res.status(500).json({
+            status: 'GetRestaurantsError',
+            message: err
+        });
 
-    Restaurant.findByPk(id)
-        .then((restaurant) => res.json(restaurant))
-        .catch(() =>
-            res.status(404).json({
-                status: 'RestaurantNotFound',
-                id
-            })
-        );
-});
+    const { count } = await Restaurant.findAndCountAll().catch((err) =>
+        errorHandler(err)
+    );
 
-router.post('/', (req, res) =>
-    Restaurant.create(req.body, {
-        field: ['name', 'city', 'address']
+    if (!count)
+        res.json({
+            result: [],
+            count: count,
+            pages: Math.ceil(count / size)
+        });
+
+    Restaurant.findAll({
+        offset: size * (offset - 1),
+        limit,
+        order: [['id', 'ASC']]
     })
-        .then((restaurant) =>
+        .then((restaurants) =>
             res.json({
-                status: 'RestaurantCreated',
-                ...restaurant.dataValues
+                result: restaurants,
+                count: count,
+                pages: Math.ceil(count / size)
             })
         )
-        .catch((err) => {
-            const statusCode = err.message.includes('Validation') ? 400 : 500;
-
-            res.status(statusCode).json({
-                status: 'RestaurantCreationError',
-                message: err.errors[0].message
-            });
-        })
-);
-
-router.patch('/:id', async (req, res) => {
-    const { id } = req.params;
-
-    const restaurant = await Restaurant.findByPk(id);
-
-    if (!restaurant) {
-        res.status(404).json({
-            status: 'RestaurantNotFound',
-            id
-        });
-    } else {
-        restaurant
-            .update(req.body)
-            .then((updatedRestaurant) =>
-                res.json({
-                    status: 'RestaurantUpdated',
-                    ...updatedRestaurant.dataValues
-                })
-            )
-            .catch((err) => {
-                const statusCode = err.message.includes('Validation')
-                    ? 400
-                    : 500;
-
-                res.status(statusCode).json({
-                    status: 'RestaurantUpdatingError',
-                    message: err.errors[0].message
-                });
-            });
-    }
+        .catch((err) => errorHandler(err));
 });
 
-router.delete('/:id', async (req, res) => {
+router.get('/:id', common, async (req, res) => {
     const { id } = req.params;
 
-    const restaurant = await Restaurant.findByPk(id);
+    const restaurant = await Restaurant.findByPk(id, {
+        include: [{ model: Order, as: 'Orders' }]
+    }).catch((err) =>
+        res.status(500).json({
+            status: 'GetRestaurantByIdError',
+            message: err
+        })
+    );
 
-    if (!restaurant) {
+    if (!restaurant)
         res.status(404).json({
             status: 'RestaurantNotFound',
-            id
+            id: parseInt(id)
         });
-    } else {
-        restaurant.destroy();
 
-        res.json({
-            status: 'RestaurantDeleted',
-            id
+    res.json(restaurant);
+});
+
+router.post('/', post, async (req, res) => {
+    const restaurant = await Restaurant.create(req.body).catch((err) =>
+        res.status(500).json({
+            status: 'RestaurantCreationError',
+            message: err
+        })
+    );
+
+    res.json({
+        status: 'RestaurantCreated',
+        ...restaurant.dataValues
+    });
+});
+
+router.put('/:id', put, async (req, res) => {
+    const { id } = req.params;
+
+    const errorHandler = (err) =>
+        res.status(500).json({
+            status: 'RestaurantUpdatingError',
+            message: err
         });
-    }
+
+    const restaurant = await Restaurant.findByPk(id).catch((err) =>
+        errorHandler(err)
+    );
+
+    if (!restaurant)
+        res.status(404).json({
+            status: 'RestaurantNotFound',
+            id: parseInt(id)
+        });
+
+    restaurant
+        .update(req.body)
+        .then((updatedRestaurant) =>
+            res.json({
+                status: 'RestaurantUpdated',
+                ...updatedRestaurant.dataValues
+            })
+        )
+        .catch((err) => errorHandler(err));
+});
+
+router.delete('/:id', common, async (req, res) => {
+    const { id } = req.params;
+
+    const restaurant = await Restaurant.findByPk(id).catch((err) =>
+        res.status(500).json({
+            status: 'RestaurantDeletionError',
+            message: err
+        })
+    );
+
+    if (!restaurant)
+        res.status(404).json({
+            status: 'RestaurantNotFound',
+            id: parseInt(id)
+        });
+
+    await restaurant.destroy();
+
+    res.json({
+        status: 'RestaurantDeleted',
+        ...restaurant.dataValues
+    });
 });
 
 module.exports = router;

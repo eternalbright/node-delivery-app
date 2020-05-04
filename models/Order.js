@@ -8,65 +8,46 @@ const Order = sequelize.define('order', {
         autoIncrement: true,
         primaryKey: true
     },
-    customerId: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
-    courierId: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
-    cost: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        validate: {
-            notNull: {
-                args: true,
-                msg: 'A cost should be specified'
-            }
-        }
-    },
     city: {
-        type: DataTypes.STRING(30),
+        type: DataTypes.STRING(50),
         allowNull: false,
-        validate: {
-            notNull: {
-                args: true,
-                msg: 'A city should be specified'
-            },
-            isAlpha: {
-                args: true,
-                msg: 'A city should be a string literal'
-            }
-        }
+        noUpdate: true
     },
     district: {
-        type: DataTypes.STRING(30),
-        allowNull: false,
-        validate: {
-            notNull: {
-                args: true,
-                msg: 'A district should be specified'
-            },
-            isAlpha: {
-                args: true,
-                msg: 'A district should be a string literal'
-            }
-        }
+        type: DataTypes.STRING(50),
+        allowNull: false
     },
     address: {
         type: DataTypes.STRING(50),
+        allowNull: false
+    },
+    customerId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-        validate: {
-            notNull: {
-                args: true,
-                msg: 'An address should be specified'
-            },
-            isAlphanumeric: {
-                args: true,
-                msg: 'An address should be an alphanumeric string'
-            }
-        }
+        noUpdate: true
+    },
+    courierId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        noUpdate: true
+    },
+    restaurantId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        noUpdate: true
+    },
+    cost: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    isDelivered: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+    },
+    deliveredAt: {
+        type: DataTypes.DATE,
+        noUpdate: true
     }
 });
 

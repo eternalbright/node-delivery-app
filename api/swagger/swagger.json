@@ -1,0 +1,730 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Delivery app API"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "schemes": [
+        "http"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/api/v1/couriers": {
+            "get": {
+                "description": "Get all couriers",
+                "summary": "Get couriers",
+                "operationId": "GetOperations",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Reduces quantity of retrieved records"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Page of retrieved records"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Couriers list"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new courier",
+                "summary": "Create a courier",
+                "operationId": "PostOperations",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "courier",
+                        "description": "The courier to create",
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "name",
+                                "city"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "city": {
+                                    "type": "string",
+                                    "maximum": 50
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Courier created"
+                    },
+                    "400": {
+                        "description": "Body violates the pattern"
+                    }
+                }
+            }
+        },
+        "/api/v1/couriers/{id}": {
+            "get": {
+                "description": "Get courier by id",
+                "summary": "Get courier by id",
+                "operationId": "GetOperations",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Id of the courier record"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Courier info"
+                    },
+                    "404": {
+                        "description": "Courier does not exist"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "put": {
+                "description": "Update the courier",
+                "summary": "Update the courier",
+                "operationId": "PostOperations",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Id of the courier record"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "courier",
+                        "description": "The courier to update",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "city": {
+                                    "type": "string",
+                                    "maximum": 50
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Courier updated"
+                    },
+                    "400": {
+                        "description": "Body violates the pattern"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete the courier",
+                "summary": "Delete the courier",
+                "operationId": "GetOperations",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Id of the courier record"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Courier deleted"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/customers": {
+            "get": {
+                "description": "Get all customers",
+                "summary": "Get customers",
+                "operationId": "GetOperations",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Reduces quantity of retrieved records"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Page of retrieved records"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Customers list"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new customer",
+                "summary": "Create a customer",
+                "operationId": "PostOperations",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "customer",
+                        "description": "The customer to create",
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "name",
+                                "city"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "city": {
+                                    "type": "string",
+                                    "maximum": 50
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Customer created"
+                    },
+                    "400": {
+                        "description": "Body violates the pattern"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/customers/{id}": {
+            "get": {
+                "description": "Get customer by id",
+                "summary": "Get customer by id",
+                "operationId": "GetOperations",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Id of the customer record"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Customer info"
+                    },
+                    "404": {
+                        "description": "Customer does not exist"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "put": {
+                "description": "Update the customer",
+                "summary": "Update the customer",
+                "operationId": "PostOperations",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Id of the customer record"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "customer",
+                        "description": "The customer to update",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "city": {
+                                    "type": "string",
+                                    "maximum": 50
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Customer updated"
+                    },
+                    "400": {
+                        "description": "Body violates the pattern"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete the customer",
+                "summary": "Delete the customer",
+                "operationId": "GetOperations",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Id of the customer record"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Customer deleted"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/restaurants": {
+            "get": {
+                "description": "Get all restaurants",
+                "summary": "Get restaurants",
+                "operationId": "GetOperations",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Reduces quantity of retrieved records"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Page of retrieved records"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Restaurants list"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new restaurant",
+                "summary": "Create a restaurant",
+                "operationId": "PostOperations",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "restaurant",
+                        "description": "The restaurant to create",
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "name",
+                                "city",
+                                "district",
+                                "address"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "city": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "district": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "address": {
+                                    "type": "string",
+                                    "maximum": 50
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Restaurant created"
+                    },
+                    "400": {
+                        "description": "Body violates the pattern"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/restaurants/{id}": {
+            "get": {
+                "description": "Get restaurant by id",
+                "summary": "Get restaurant by id",
+                "operationId": "GetOperations",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Id of the restaurant record"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Restaurant info"
+                    },
+                    "404": {
+                        "description": "Restaurant does not exist"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "put": {
+                "description": "Update the restaurant",
+                "summary": "Update the restaurant",
+                "operationId": "PostOperations",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Id of the restaurant record"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "restaurant",
+                        "description": "The restaurant to update",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "city": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "district": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "address": {
+                                    "type": "string",
+                                    "maximum": 50
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Restaurant updated"
+                    },
+                    "400": {
+                        "description": "Body violates the pattern"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete the restaurant",
+                "summary": "Delete the restaurant",
+                "operationId": "GetOperations",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Id of the restaurant record"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Restaurant deleted"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/orders": {
+            "get": {
+                "description": "Get all orders",
+                "summary": "Get orders",
+                "operationId": "GetOperations",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Reduces quantity of retrieved records"
+                        }
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Page of retrieved records"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Orders list"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new order",
+                "summary": "Create a order",
+                "operationId": "PostOperations",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "order",
+                        "description": "The order to create",
+                        "schema": {
+                            "type": "object",
+                            "required": [
+                                "address",
+                                "city",
+                                "cost",
+                                "customerId",
+                                "district",
+                                "restaurantId"
+                            ],
+                            "properties": {
+                                "address": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "city": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "cost": {
+                                    "type": "integer"
+                                },
+                                "customerId": {
+                                    "type": "integer"
+                                },
+                                "district": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "restaurantId": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order created"
+                    },
+                    "400": {
+                        "description": "Body violates the pattern"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/orders/{id}": {
+            "get": {
+                "description": "Get order by id",
+                "summary": "Get order by id",
+                "operationId": "GetOperations",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Id of the order record"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order info"
+                    },
+                    "404": {
+                        "description": "Order does not exist"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "put": {
+                "description": "Update the order",
+                "summary": "Update the order",
+                "operationId": "PostOperations",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Id of the order record"
+                        }
+                    },
+                    {
+                        "in": "body",
+                        "name": "order",
+                        "description": "The order to update",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "address": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "cost": {
+                                    "type": "integer"
+                                },
+                                "district": {
+                                    "type": "string",
+                                    "maximum": 50
+                                },
+                                "isDelivered": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order updated"
+                    },
+                    "400": {
+                        "description": "Body violates the pattern"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete the order",
+                "summary": "Delete the order",
+                "operationId": "GetOperations",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Id of the order record"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order deleted"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        }
+    }
+}

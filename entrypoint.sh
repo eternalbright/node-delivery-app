@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
 
-npx sequelize db:migrate
+npm run drop
+npm run migration
+npm run generation
+
 node app.js

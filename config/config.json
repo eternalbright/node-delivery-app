@@ -1,9 +1,0 @@
-{
-    "docker": {
-        "username": "root",
-        "password": "KnNrgR8M3u2Hyk1rDL0ophkP",
-        "database": "delivery",
-        "host": "db",
-        "dialect": "postgres"
-    }
-}

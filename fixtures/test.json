@@ -1,0 +1,25 @@
+[
+    {
+        "model": "Courier",
+        "data": {
+            "name": "testCourier",
+            "city": "testCity"
+        }
+    },
+    {
+        "model": "Customer",
+        "data": {
+            "name": "testCustomer",
+            "city": "testCity"
+        }
+    },
+    {
+        "model": "Restaurant",
+        "data": {
+            "name": "testRestaurant",
+            "city": "testCity",
+            "district": "testRestaurantDistrict",
+            "address": "testRestaurantAddress"
+        }
+    }
+]
