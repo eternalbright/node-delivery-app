@@ -10,10 +10,10 @@
 `npm install`
 
 ##### Run development instance (`sqlite3`)
-`npm start`
+`npm run start`
 
 ##### Run tests (sqlite3)
-`npm tests`
+`npm run test`
 
 ##### Run production instance (`postgres`)
 `npm run prod`
