@@ -1,6 +1,9 @@
 # node-delivery-app
 ## Simple Node.js delivery app
 
+##### Requirements
+`docker`, `docker-compose`
+
 ##### Install dependencies
 `npm install`
 

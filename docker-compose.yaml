@@ -27,8 +27,6 @@ services:
       - db
     expose:
       - "8080"
-#    external_links:
-#      - db:db
     networks:
       - default
   db:
