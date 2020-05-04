@@ -5,7 +5,7 @@ const helmet = require('helmet');
 const logger = require('morgan');
 const swaggerUi = require('swagger-ui-express');
 
-const swaggerReference = require('./api/swagger/swagger.json');
+const swaggerReference = require('./swagger.json');
 
 const rateLimit = require('./middlewares/rateLimit');
 const validateRoute = require('./middlewares/validateRoute');

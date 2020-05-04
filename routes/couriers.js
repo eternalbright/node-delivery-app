@@ -9,7 +9,7 @@ const router = Router();
 router.get('/', getAll, async (req, res) => {
     const { page, limit } = req.query;
 
-    const offset = page || 0;
+    const offset = page || 1;
     const size = limit || 20;
 
     const errorHandler = (err) =>
@@ -31,7 +31,7 @@ router.get('/', getAll, async (req, res) => {
 
     Courier.findAll({
         offset: size * (offset - 1),
-        limit,
+        limit: size,
         order: [['id', 'ASC']]
     })
         .then((couriers) =>
@@ -87,13 +87,15 @@ router.get('/:id/stats', common, async (req, res) => {
             id: parseInt(id)
         });
 
-    const totalOrders = await Order.count({
+    const totalOrders =
+        (await Order.count({
             where: { courierId: id }
-        }).catch((err) => errorHandler(err)) || 0;
+        }).catch((err) => errorHandler(err))) || 0;
 
-    const totalOrdersCost = await Order.sum('cost', {
+    const totalOrdersCost =
+        (await Order.sum('cost', {
             where: { courierId: id, isDelivered: true }
-        }).catch((err) => errorHandler(err)) || 0;
+        }).catch((err) => errorHandler(err))) || 0;
 
     const mostPopularDeliveryPoints = await Order.findAll({
         where: { courierId: id },

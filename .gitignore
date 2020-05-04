@@ -1,5 +1,7 @@
 .*
 
+*.sqlite
+
 !.dockerignore
 !.env
 !.eslintrc
@@ -9,4 +11,3 @@
 
 coverage/
 node_modules/
-storage/

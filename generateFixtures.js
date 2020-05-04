@@ -12,7 +12,7 @@ const models = require('./models/define');
     const cities = [];
     const districts = [];
 
-    function generateInstances() {
+    async function generateInstances() {
         for (let i = 1; i <= 10; i++) cities.push(address.city());
         for (let i = 1; i <= 20; i++) districts.push(address.streetName());
         for (let i = 1; i <= 30; i++) addresses.push(address.streetAddress());
@@ -40,14 +40,17 @@ const models = require('./models/define');
                 data: {
                     name: company.companyName(),
                     city: cities[Math.floor(Math.random() * cities.length)],
-                    district: districts[Math.floor(Math.random() * districts.length)],
+                    district:
+                        districts[Math.floor(Math.random() * districts.length)],
                     address: address.streetAddress()
                 }
             });
         }
+
+        return true;
     }
 
-    function generateOrders() {
+    async function generateOrders() {
         for (let id = 1; id <= 500; id++) {
             const city = cities[Math.floor(Math.random() * cities.length)];
 
@@ -62,17 +65,24 @@ const models = require('./models/define');
             );
 
             const Customer =
-                customersInCity[Math.floor(Math.random() * customersInCity.length)];
+                customersInCity[
+                    Math.floor(Math.random() * customersInCity.length)
+                ];
             const Courier =
-                couriersInCity[Math.floor(Math.random() * couriersInCity.length)];
+                couriersInCity[
+                    Math.floor(Math.random() * couriersInCity.length)
+                ];
             const Restaurant =
-                restaurantsInCity[Math.floor(Math.random() * restaurantsInCity.length)];
+                restaurantsInCity[
+                    Math.floor(Math.random() * restaurantsInCity.length)
+                ];
 
-            const Order = {
+            data.push({
                 id,
                 model: 'Order',
                 data: {
-                    address: addresses[Math.floor(Math.random() * addresses.length)],
+                    address:
+                        addresses[Math.floor(Math.random() * addresses.length)],
                     city: city,
                     cost: Math.floor(Math.random() * 500) + 200,
                     courierId: Courier.id,
@@ -81,13 +91,14 @@ const models = require('./models/define');
                     restaurantId: Restaurant.id,
                     isDelivered: true,
                     deliveredAt: new Date(
-                        new Date().getTime() + Math.floor(Math.random() * 10000) * 500
+                        new Date().getTime() +
+                            Math.floor(Math.random() * 10000) * 500
                     )
                 }
-            };
-
-            data.push(Order);
+            });
         }
+
+        return true;
     }
 
     console.log('Generating fixtures...');

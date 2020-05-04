@@ -8,7 +8,7 @@ const router = Router();
 router.get('/', getAll, async (req, res) => {
     const { page, limit } = req.query;
 
-    const offset = page || 0;
+    const offset = page || 1;
     const size = limit || 20;
 
     const errorHandler = (err) =>
@@ -30,7 +30,7 @@ router.get('/', getAll, async (req, res) => {
 
     Restaurant.findAll({
         offset: size * (offset - 1),
-        limit,
+        limit: size,
         order: [['id', 'ASC']]
     })
         .then((restaurants) =>
