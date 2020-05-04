@@ -5,25 +5,53 @@ const { name, address, company } = require('faker');
 
 const models = require('./models/define');
 
-(async function () {
+(function () {
     const data = [];
 
     const addresses = [];
     const cities = [];
     const districts = [];
 
-    async function generateInstances() {
-        for (let i = 1; i <= 10; i++) cities.push(address.city());
-        for (let i = 1; i <= 20; i++) districts.push(address.streetName());
-        for (let i = 1; i <= 30; i++) addresses.push(address.streetAddress());
+    for (let i = 1; i <= 10; i++) cities.push(address.city());
+    for (let i = 1; i <= 20; i++) districts.push(address.streetName());
+    for (let i = 1; i <= 30; i++) addresses.push(address.streetAddress());
 
+    function getRandomValue(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function getRandomEntities(city) {
+        function search(arr, model) {
+            let results = [];
+
+            arr.forEach((item) => {
+                if (item.model === model && item.data.city === city) {
+                    results.push(item);
+                }
+            });
+
+            return results;
+        }
+
+        const couriersInCity = search(data, 'Courier');
+        const customersInCity = search(data, 'Customer');
+        const restaurantsInCity = search(data, 'Restaurant');
+
+        return {
+            Courier: getRandomValue(couriersInCity),
+            Customer: getRandomValue(customersInCity),
+            Restaurant: getRandomValue(restaurantsInCity)
+        };
+    }
+
+    function generateInstances() {
         for (let id = 1; id < 50; id++) {
             data.push({
                 id,
                 model: 'Courier',
                 data: {
                     name: name.findName(),
-                    city: cities[Math.floor(Math.random() * cities.length)]
+                    city: getRandomValue(cities)
                 }
             });
             data.push({
@@ -31,7 +59,7 @@ const models = require('./models/define');
                 model: 'Customer',
                 data: {
                     name: name.findName(),
-                    city: cities[Math.floor(Math.random() * cities.length)]
+                    city: getRandomValue(cities)
                 }
             });
             data.push({
@@ -39,51 +67,26 @@ const models = require('./models/define');
                 model: 'Restaurant',
                 data: {
                     name: company.companyName(),
-                    city: cities[Math.floor(Math.random() * cities.length)],
-                    district:
-                        districts[Math.floor(Math.random() * districts.length)],
+                    city: getRandomValue(cities),
+                    district: getRandomValue(districts),
                     address: address.streetAddress()
                 }
             });
         }
-
-        return true;
     }
 
-    async function generateOrders() {
-        for (let id = 1; id <= 500; id++) {
-            const city = cities[Math.floor(Math.random() * cities.length)];
+    function generateOrders() {
+        for (let id = 1; id <= 200; id++) {
+            const city = getRandomValue(cities);
 
-            const customersInCity = data.filter(
-                (x) => x.model === 'Customer' && x.data.city === city
-            );
-            const couriersInCity = data.filter(
-                (x) => x.model === 'Courier' && x.data.city === city
-            );
-            const restaurantsInCity = data.filter(
-                (x) => x.model === 'Restaurant' && x.data.city === city
-            );
-
-            const Customer =
-                customersInCity[
-                    Math.floor(Math.random() * customersInCity.length)
-                ];
-            const Courier =
-                couriersInCity[
-                    Math.floor(Math.random() * couriersInCity.length)
-                ];
-            const Restaurant =
-                restaurantsInCity[
-                    Math.floor(Math.random() * restaurantsInCity.length)
-                ];
+            const { Courier, Customer, Restaurant } = getRandomEntities(city);
 
             data.push({
                 id,
                 model: 'Order',
                 data: {
-                    address:
-                        addresses[Math.floor(Math.random() * addresses.length)],
-                    city: city,
+                    city,
+                    address: getRandomValue(addresses),
                     cost: Math.floor(Math.random() * 500) + 200,
                     courierId: Courier.id,
                     customerId: Customer.id,
@@ -97,14 +100,12 @@ const models = require('./models/define');
                 }
             });
         }
-
-        return true;
     }
 
     console.log('Generating fixtures...');
 
-    await generateInstances();
-    await generateOrders();
+    generateInstances();
+    generateOrders();
 
-    await loadFixtures(data, models);
+    loadFixtures(data, models);
 })();

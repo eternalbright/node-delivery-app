@@ -20,7 +20,7 @@
             "get": {
                 "description": "Get all couriers",
                 "summary": "Get couriers",
-                "operationId": "GetOperations",
+                "operationId": "GetCouriersOperations",
                 "parameters": [
                     {
                         "in": "query",
@@ -51,7 +51,7 @@
             "post": {
                 "description": "Create a new courier",
                 "summary": "Create a courier",
-                "operationId": "PostOperations",
+                "operationId": "PostCourierOperations",
                 "parameters": [
                     {
                         "in": "body",
@@ -90,7 +90,7 @@
             "get": {
                 "description": "Get courier by id",
                 "summary": "Get courier by id",
-                "operationId": "GetOperations",
+                "operationId": "GetCourierOperations",
                 "parameters": [
                     {
                         "in": "path",
@@ -116,7 +116,7 @@
             "put": {
                 "description": "Update the courier",
                 "summary": "Update the courier",
-                "operationId": "PostOperations",
+                "operationId": "PutCourierOperations",
                 "parameters": [
                     {
                         "in": "path",
@@ -160,7 +160,7 @@
             "delete": {
                 "description": "Delete the courier",
                 "summary": "Delete the courier",
-                "operationId": "GetOperations",
+                "operationId": "DeleteCourierOperations",
                 "parameters": [
                     {
                         "in": "path",
@@ -181,11 +181,39 @@
                 }
             }
         },
+        "/api/v1/couriers/{id}/stats": {
+            "get": {
+                "description": "Get courier statistics by id",
+                "summary": "Get courier statistics by id",
+                "operationId": "GetCourierOperations",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Id of the courier record"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Courier statistics"
+                    },
+                    "404": {
+                        "description": "Courier does not exist"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/api/v1/customers": {
             "get": {
                 "description": "Get all customers",
                 "summary": "Get customers",
-                "operationId": "GetOperations",
+                "operationId": "GetCustomersOperations",
                 "parameters": [
                     {
                         "in": "query",
@@ -216,7 +244,7 @@
             "post": {
                 "description": "Create a new customer",
                 "summary": "Create a customer",
-                "operationId": "PostOperations",
+                "operationId": "PostCustomerOperations",
                 "parameters": [
                     {
                         "in": "body",
@@ -258,7 +286,7 @@
             "get": {
                 "description": "Get customer by id",
                 "summary": "Get customer by id",
-                "operationId": "GetOperations",
+                "operationId": "GetCustomerOperations",
                 "parameters": [
                     {
                         "in": "path",
@@ -284,7 +312,7 @@
             "put": {
                 "description": "Update the customer",
                 "summary": "Update the customer",
-                "operationId": "PostOperations",
+                "operationId": "PutCustomerOperations",
                 "parameters": [
                     {
                         "in": "path",
@@ -328,7 +356,7 @@
             "delete": {
                 "description": "Delete the customer",
                 "summary": "Delete the customer",
-                "operationId": "GetOperations",
+                "operationId": "DeleteCustomerOperations",
                 "parameters": [
                     {
                         "in": "path",
@@ -353,7 +381,7 @@
             "get": {
                 "description": "Get all restaurants",
                 "summary": "Get restaurants",
-                "operationId": "GetOperations",
+                "operationId": "GetRestaurantsOperations",
                 "parameters": [
                     {
                         "in": "query",
@@ -384,7 +412,7 @@
             "post": {
                 "description": "Create a new restaurant",
                 "summary": "Create a restaurant",
-                "operationId": "PostOperations",
+                "operationId": "PostRestaurantOperations",
                 "parameters": [
                     {
                         "in": "body",
@@ -436,7 +464,7 @@
             "get": {
                 "description": "Get restaurant by id",
                 "summary": "Get restaurant by id",
-                "operationId": "GetOperations",
+                "operationId": "GetRestaurantOperations",
                 "parameters": [
                     {
                         "in": "path",
@@ -462,7 +490,7 @@
             "put": {
                 "description": "Update the restaurant",
                 "summary": "Update the restaurant",
-                "operationId": "PostOperations",
+                "operationId": "PutRestaurantOperations",
                 "parameters": [
                     {
                         "in": "path",
@@ -514,7 +542,7 @@
             "delete": {
                 "description": "Delete the restaurant",
                 "summary": "Delete the restaurant",
-                "operationId": "GetOperations",
+                "operationId": "DeleteRestaurantOperations",
                 "parameters": [
                     {
                         "in": "path",
@@ -539,7 +567,7 @@
             "get": {
                 "description": "Get all orders",
                 "summary": "Get orders",
-                "operationId": "GetOperations",
+                "operationId": "GetOrdersOperations",
                 "parameters": [
                     {
                         "in": "query",
@@ -570,7 +598,7 @@
             "post": {
                 "description": "Create a new order",
                 "summary": "Create a order",
-                "operationId": "PostOperations",
+                "operationId": "PostOrderOperations",
                 "parameters": [
                     {
                         "in": "body",
@@ -629,7 +657,7 @@
             "get": {
                 "description": "Get order by id",
                 "summary": "Get order by id",
-                "operationId": "GetOperations",
+                "operationId": "GetOrderOperations",
                 "parameters": [
                     {
                         "in": "path",
@@ -655,7 +683,7 @@
             "put": {
                 "description": "Update the order",
                 "summary": "Update the order",
-                "operationId": "PostOperations",
+                "operationId": "PutOrderOperations",
                 "parameters": [
                     {
                         "in": "path",
@@ -705,7 +733,7 @@
             "delete": {
                 "description": "Delete the order",
                 "summary": "Delete the order",
-                "operationId": "GetOperations",
+                "operationId": "DeleteOrderOperations",
                 "parameters": [
                     {
                         "in": "path",

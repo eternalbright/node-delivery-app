@@ -1,3 +1,4 @@
+const { unlinkSync } = require('fs');
 const { loadFile } = require('sequelize-fixtures');
 const request = require('supertest');
 
@@ -5,19 +6,19 @@ const app = require('../app');
 const models = require('../models/define');
 
 const apiPrefix = '/api/v1';
+const url = (endpoint) => apiPrefix + endpoint;
 
 describe('Courier CRUD', () => {
-    const url = `${apiPrefix}/couriers`;
+    const endpoint = '/couriers';
+    const uri = url(endpoint);
 
     let localStorage;
 
     it('should create a new courier', async () => {
-        const res = await request(app).post(url).send({
+        const { body, statusCode } = await request(app).post(uri).send({
             name: 'testCourier',
             city: 'testCity'
         });
-
-        const { body, statusCode } = res;
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('status', 'CourierCreated');
@@ -31,9 +32,7 @@ describe('Courier CRUD', () => {
     });
 
     it('should get all couriers', async () => {
-        const res = await request(app).get(url);
-
-        const { body, statusCode } = res;
+        const { body, statusCode } = await request(app).get(uri);
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('count', 1);
@@ -44,9 +43,7 @@ describe('Courier CRUD', () => {
     it('should get a courier by id', async () => {
         const { id, name, city, isDelivering } = localStorage;
 
-        const res = await request(app).get(`${url}/${id}`);
-
-        const { body, statusCode } = res;
+        const { body, statusCode } = await request(app).get(`${uri}/${id}`);
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('id', id);
@@ -55,14 +52,26 @@ describe('Courier CRUD', () => {
         expect(body).toHaveProperty('isDelivering', isDelivering);
     });
 
+    it('should get a courier statistics by id', async () => {
+        const { id } = localStorage;
+
+        const { body, statusCode } = await request(app).get(
+            `${uri}/${id}/stats`
+        );
+
+        expect(statusCode).toStrictEqual(200);
+        expect(body).toHaveProperty('totalOrders', 0);
+        expect(body).toHaveProperty('totalOrdersCost', 0);
+        expect(body).toHaveProperty('averageDeliveryTime', null);
+        expect(body).toHaveProperty('mostPopularDeliveryPoints', []);
+    });
+
     it('should update a courier', async () => {
         const { id, city, isDelivering } = localStorage;
 
-        const res = await request(app)
-            .put(`${url}/${id}`)
+        const { body, statusCode } = await request(app)
+            .put(`${uri}/${id}`)
             .send({ name: 'updatedCourier' });
-
-        const { body, statusCode } = res;
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('id', id);
@@ -77,9 +86,7 @@ describe('Courier CRUD', () => {
     it('should delete a courier', async () => {
         const { id, name, city, isDelivering } = localStorage;
 
-        const res = await request(app).delete(`${url}/${id}`);
-
-        const { body, statusCode } = res;
+        const { body, statusCode } = await request(app).delete(`${uri}/${id}`);
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('status', 'CourierDeleted');
@@ -91,17 +98,16 @@ describe('Courier CRUD', () => {
 });
 
 describe('Customer CRUD', () => {
-    const url = `${apiPrefix}/customers`;
+    const endpoint = '/customers';
+    const uri = url(endpoint);
 
     let localStorage;
 
     it('should create a new customer', async () => {
-        const res = await request(app).post(url).send({
+        const { body, statusCode } = await request(app).post(uri).send({
             name: 'testCustomer',
             city: 'testCity'
         });
-
-        const { body, statusCode } = res;
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('status', 'CustomerCreated');
@@ -114,9 +120,7 @@ describe('Customer CRUD', () => {
     });
 
     it('should get all customers', async () => {
-        const res = await request(app).get(url);
-
-        const { body, statusCode } = res;
+        const { body, statusCode } = await request(app).get(uri);
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('count', 1);
@@ -127,9 +131,7 @@ describe('Customer CRUD', () => {
     it('should get a customer by id', async () => {
         const { id, name, city } = localStorage;
 
-        const res = await request(app).get(`${url}/${id}`);
-
-        const { body, statusCode } = res;
+        const { body, statusCode } = await request(app).get(`${uri}/${id}`);
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('id', id);
@@ -140,11 +142,9 @@ describe('Customer CRUD', () => {
     it('should update a customer', async () => {
         const { id } = localStorage;
 
-        const res = await request(app)
-            .put(`${url}/${id}`)
+        const { body, statusCode } = await request(app)
+            .put(`${uri}/${id}`)
             .send({ name: 'updatedCustomer' });
-
-        const { body, statusCode } = res;
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('id', id);
@@ -157,9 +157,7 @@ describe('Customer CRUD', () => {
     it('should delete a customer', async () => {
         const { id, name, city } = localStorage;
 
-        const res = await request(app).delete(`${url}/${id}`);
-
-        const { body, statusCode } = res;
+        const { body, statusCode } = await request(app).delete(`${uri}/${id}`);
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('status', 'CustomerDeleted');
@@ -170,19 +168,18 @@ describe('Customer CRUD', () => {
 });
 
 describe('Restaurant CRUD', () => {
-    const url = `${apiPrefix}/restaurants`;
+    const endpoint = '/restaurants';
+    const uri = url(endpoint);
 
     let localStorage;
 
     it('should create a new restaurant', async () => {
-        const res = await request(app).post(url).send({
+        const { body, statusCode } = await request(app).post(uri).send({
             name: 'testRestaurant',
             city: 'testCity',
             district: 'testRestaurantDistrict',
             address: 'testRestaurantAddress'
         });
-
-        const { body, statusCode } = res;
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('status', 'RestaurantCreated');
@@ -195,9 +192,7 @@ describe('Restaurant CRUD', () => {
     });
 
     it('should get all restaurants', async () => {
-        const res = await request(app).get(url);
-
-        const { body, statusCode } = res;
+        const { body, statusCode } = await request(app).get(uri);
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('count', 1);
@@ -208,9 +203,7 @@ describe('Restaurant CRUD', () => {
     it('should get a restaurant by id', async () => {
         const { id, name, city, district, address } = localStorage;
 
-        const res = await request(app).get(`${url}/${id}`);
-
-        const { body, statusCode } = res;
+        const { body, statusCode } = await request(app).get(`${uri}/${id}`);
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('id', id);
@@ -223,13 +216,13 @@ describe('Restaurant CRUD', () => {
     it('should update a restaurant', async () => {
         const { id } = localStorage;
 
-        const res = await request(app).put(`${url}/${id}`).send({
-            name: 'updatedRestaurantName',
-            district: 'updatedRestaurantDistrict',
-            address: 'updatedRestaurantAddress'
-        });
-
-        const { body, statusCode } = res;
+        const { body, statusCode } = await request(app)
+            .put(`${uri}/${id}`)
+            .send({
+                name: 'updatedRestaurantName',
+                district: 'updatedRestaurantDistrict',
+                address: 'updatedRestaurantAddress'
+            });
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('id', id);
@@ -244,9 +237,7 @@ describe('Restaurant CRUD', () => {
     it('should delete a restaurant', async () => {
         const { id, name, city, district, address } = localStorage;
 
-        const res = await request(app).delete(`${url}/${id}`);
-
-        const { body, statusCode } = res;
+        const { body, statusCode } = await request(app).delete(`${uri}/${id}`);
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('status', 'RestaurantDeleted');
@@ -259,7 +250,8 @@ describe('Restaurant CRUD', () => {
 });
 
 describe('Order CRUD', () => {
-    const url = `${apiPrefix}/orders`;
+    const endpoint = '/orders';
+    const uri = url(endpoint);
 
     let localStorage = {};
 
@@ -268,7 +260,7 @@ describe('Order CRUD', () => {
     });
 
     it('should create a new order', async () => {
-        const res = await request(app).post(url).send({
+        const { body, statusCode } = await request(app).post(uri).send({
             city: 'testCity',
             district: 'testOrderDistrict',
             address: 'testOrderAddress',
@@ -276,8 +268,6 @@ describe('Order CRUD', () => {
             restaurantId: 2,
             cost: 1000
         });
-
-        const { body, statusCode } = res;
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('status', 'OrderCreated');
@@ -296,9 +286,7 @@ describe('Order CRUD', () => {
     });
 
     it('should get all orders', async () => {
-        const res = await request(app).get(url);
-
-        const { body, statusCode } = res;
+        const { body, statusCode } = await request(app).get(uri);
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('count', 1);
@@ -317,9 +305,7 @@ describe('Order CRUD', () => {
             cost
         } = localStorage;
 
-        const res = await request(app).get(`${url}/${id}`);
-
-        const { body, statusCode } = res;
+        const { body, statusCode } = await request(app).get(`${uri}/${id}`);
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('id', id);
@@ -342,11 +328,11 @@ describe('Order CRUD', () => {
             cost
         } = localStorage;
 
-        const res = await request(app).put(`${url}/${id}`).send({
-            isDelivered: true
-        });
-
-        const { body, statusCode } = res;
+        const { body, statusCode } = await request(app)
+            .put(`${uri}/${id}`)
+            .send({
+                isDelivered: true
+            });
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('id', id);
@@ -376,9 +362,7 @@ describe('Order CRUD', () => {
             deliveredAt
         } = localStorage;
 
-        const res = await request(app).delete(`${url}/${id}`);
-
-        const { body, statusCode } = res;
+        const { body, statusCode } = await request(app).delete(`${uri}/${id}`);
 
         expect(statusCode).toStrictEqual(200);
         expect(body).toHaveProperty('status', 'OrderDeleted');
@@ -391,5 +375,148 @@ describe('Order CRUD', () => {
         expect(body).toHaveProperty('cost', cost);
         expect(body).toHaveProperty('isDelivered', isDelivered);
         expect(body).toHaveProperty('deliveredAt', deliveredAt);
+    });
+});
+
+describe('Corner cases', () => {
+    const clearData = async () => {
+        const { Courier, Customer, Order, Restaurant } = models;
+
+        await Courier.sync({ force: true });
+        await Customer.sync({ force: true });
+        await Order.sync({ force: true });
+        await Restaurant.sync({ force: true });
+    };
+
+    beforeAll(async () => {
+        await clearData();
+        await loadFile('fixtures/test.json', models);
+    });
+
+    it('should return an empty array if no records', async () => {
+        await clearData();
+
+        const couriers = await request(app).get(`${apiPrefix}/couriers`);
+        const customers = await request(app).get(`${apiPrefix}/customers`);
+        const orders = await request(app).get(`${apiPrefix}/orders`);
+        const restaurants = await request(app).get(`${apiPrefix}/restaurants`);
+
+        expect(couriers.statusCode).toStrictEqual(200);
+        expect(couriers.body).toHaveProperty('count', 0);
+        expect(couriers.body).toHaveProperty('pages', 0);
+        expect(couriers.body).toHaveProperty('result', []);
+
+        expect(customers.statusCode).toStrictEqual(200);
+        expect(customers.body).toHaveProperty('count', 0);
+        expect(customers.body).toHaveProperty('pages', 0);
+        expect(customers.body).toHaveProperty('result', []);
+
+        expect(orders.statusCode).toStrictEqual(200);
+        expect(orders.body).toHaveProperty('count', 0);
+        expect(orders.body).toHaveProperty('pages', 0);
+        expect(orders.body).toHaveProperty('result', []);
+
+        expect(restaurants.statusCode).toStrictEqual(200);
+        expect(restaurants.body).toHaveProperty('count', 0);
+        expect(restaurants.body).toHaveProperty('pages', 0);
+        expect(restaurants.body).toHaveProperty('result', []);
+
+        await loadFile('fixtures/test.json', models);
+    });
+
+    it('should fail on creating a new order if order city and restautant city does not match', async () => {
+        const { body, statusCode } = await request(app)
+            .post(url('/orders'))
+            .send({
+                city: 'testCity',
+                district: 'testOrderDistrict',
+                address: 'testOrderAddress',
+                customerId: 1,
+                restaurantId: 2,
+                cost: 1000
+            });
+
+        expect(statusCode).toStrictEqual(404);
+        expect(body).toHaveProperty('status', 'OrderCreationError');
+    });
+
+    it('should fail on creating a new order if order city and customer city does not match', async () => {
+        const { body, statusCode } = await request(app)
+            .post(url('/orders'))
+            .send({
+                city: 'testOrderCity',
+                district: 'testOrderDistrict',
+                address: 'testOrderAddress',
+                customerId: 2,
+                restaurantId: 1,
+                cost: 1000
+            });
+
+        expect(statusCode).toStrictEqual(404);
+        expect(body).toHaveProperty('status', 'OrderCreationError');
+    });
+
+    it('should fail on creating a new order if no couriers available in the order city', async () => {
+        const firstOrder = await request(app).post(url('/orders')).send({
+            city: 'testCity',
+            district: 'testOrderDistrict',
+            address: 'testOrderAddress',
+            customerId: 1,
+            restaurantId: 1,
+            cost: 1000
+        });
+
+        const secondOrder = await request(app).post(url('/orders')).send({
+            city: 'testCity',
+            district: 'testOrderDistrict',
+            address: 'testOrderAddress',
+            customerId: 2,
+            restaurantId: 2,
+            cost: 2000
+        });
+
+        expect(firstOrder.statusCode).toStrictEqual(200);
+        expect(firstOrder.body).toHaveProperty('status', 'OrderCreated');
+        expect(firstOrder.body).toHaveProperty('id', 1);
+        expect(firstOrder.body).toHaveProperty('city', 'testCity');
+        expect(firstOrder.body).toHaveProperty('district', 'testOrderDistrict');
+        expect(firstOrder.body).toHaveProperty('address', 'testOrderAddress');
+        expect(firstOrder.body).toHaveProperty('customerId', 1);
+        expect(firstOrder.body).toHaveProperty('restaurantId', 1);
+        expect(firstOrder.body).toHaveProperty('cost', 1000);
+        expect(firstOrder.body).toHaveProperty('isDelivered', false);
+
+        expect(secondOrder.statusCode).toStrictEqual(404);
+        expect(secondOrder.body).toHaveProperty('status', 'OrderCreationError');
+    });
+
+    it('should return 400 if request body contains errors', async () => {
+        const { body, statusCode } = await request(app)
+            .post(url('/couriers'))
+            .send(`{ "name": "testCourier", "city": "testCity", }`)
+            .type('json');
+
+        expect(statusCode).toStrictEqual(400);
+        expect(body).toHaveProperty('error', 'BadRequest');
+    });
+
+    it('should return 404 if request an unassigned route', async () => {
+        const { body, statusCode } = await request(app).get(
+            `${apiPrefix}/nonexistent`
+        );
+
+        expect(statusCode).toStrictEqual(404);
+        expect(body).toHaveProperty('error', 'NotFound');
+    });
+
+    it('should return 500 if internal server error', async () => {
+        unlinkSync('test.sqlite');
+
+        const { body, statusCode } = await request(app)
+            .post(url('/couriers'))
+            .send({ name: 'testCourier', city: 'testCity' });
+
+        expect(statusCode).toStrictEqual(500);
+        expect(body).toHaveProperty('status', 'CourierCreationError');
     });
 });
