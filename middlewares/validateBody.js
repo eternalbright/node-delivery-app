@@ -1,6 +1,6 @@
 module.exports = (err, req, res, next) => {
     if (err instanceof SyntaxError || !req.body) {
-        res.status(400).send({
+        res.status(400).json({
             statusCode: 400,
             error: 'BadRequest',
             message: 'The request body is not valid',

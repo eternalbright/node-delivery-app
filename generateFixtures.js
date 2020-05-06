@@ -37,43 +37,44 @@ const extraFixtures = require('./fixtures/prod');
     }
 
     function generateInstances() {
-            for (let id = 1; id < 50; id++) {
-                data.push({
-                    id,
-                    model: 'Courier',
-                    data: {
-                        name: name.findName(),
-                        city: getRandomValue(cities)
-                    }
-                });
-                data.push({
-                    id,
-                    model: 'Customer',
-                    data: {
-                        name: name.findName(),
-                        city: getRandomValue(cities)
-                    }
-                });
-                data.push({
-                    id,
-                    model: 'Restaurant',
-                    data: {
-                        name: company.companyName(),
-                        city: getRandomValue(cities),
-                        district: getRandomValue(districts),
-                        address: address.streetAddress()
-                    }
-                });
-            }
+        for (let id = 1; id < 50; id++) {
+            data.push({
+                id,
+                model: 'Courier',
+                data: {
+                    name: name.findName(),
+                    city: getRandomValue(cities)
+                }
+            });
+            data.push({
+                id,
+                model: 'Customer',
+                data: {
+                    name: name.findName(),
+                    city: getRandomValue(cities)
+                }
+            });
+            data.push({
+                id,
+                model: 'Restaurant',
+                data: {
+                    name: company.companyName(),
+                    city: getRandomValue(cities),
+                    district: getRandomValue(districts),
+                    address: address.streetAddress()
+                }
+            });
+        }
     }
 
     function generateOrders() {
         try {
-            throw Error('qwe')
             for (let id = 1; id <= 200; id++) {
                 const city = getRandomValue(cities);
 
-                const { Courier, Customer, Restaurant } = getRandomEntities(city);
+                const { Courier, Customer, Restaurant } = getRandomEntities(
+                    city
+                );
 
                 data.push({
                     id,
@@ -89,14 +90,14 @@ const extraFixtures = require('./fixtures/prod');
                         isDelivered: true,
                         deliveredAt: new Date(
                             new Date().getTime() +
-                            Math.floor(Math.random() * 10000) * 500
+                                Math.floor(Math.random() * 10000) * 500
                         )
                     }
                 });
             }
         } catch (e) {
             console.error('Error generating fixtures, loading backup...');
-            data = extraFixtures
+            data = extraFixtures;
         }
     }
 

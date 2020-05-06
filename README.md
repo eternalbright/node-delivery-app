@@ -12,7 +12,7 @@
 ##### Run development instance (`sqlite3`)
 `npm run start`
 
-##### Run tests (sqlite3)
+##### Run tests (`sqlite3`)
 `npm run test`
 
 ##### Run production instance (`postgres`)
