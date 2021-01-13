@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { Sequelize, Op } = require('sequelize');
 
-const { Courier, Order } = require('../models/define');
+const { Courier, Order } = require('../models');
 const { common, getAll, post, put } = require('../schemas/courier');
 
 const router = Router();
@@ -18,9 +18,7 @@ router.get('/', getAll, async (req, res) => {
             message: err
         });
 
-    const { count } = await Courier.findAndCountAll().catch((err) =>
-        errorHandler(err)
-    );
+    const { count } = await Courier.findAndCountAll().catch((err) => errorHandler(err));
 
     if (!count)
         res.json({
@@ -73,9 +71,7 @@ router.get('/:id/stats', common, async (req, res) => {
             message: err
         });
 
-    const courier = await Courier.findByPk(id).catch((err) =>
-        errorHandler(err)
-    );
+    const courier = await Courier.findByPk(id).catch((err) => errorHandler(err));
 
     if (!courier)
         res.status(404).json({
@@ -95,11 +91,7 @@ router.get('/:id/stats', common, async (req, res) => {
 
         const mostPopularDeliveryPoints = await Order.findAll({
             where: { courierId: id },
-            attributes: [
-                'district',
-                'city',
-                [Sequelize.fn('COUNT', Sequelize.col('district')), 'count']
-            ],
+            attributes: ['district', 'city', [Sequelize.fn('COUNT', Sequelize.col('district')), 'count']],
             group: ['district', 'city'],
             order: [[Sequelize.col('count'), 'DESC']]
         }).catch((err) => errorHandler(err));
@@ -112,16 +104,12 @@ router.get('/:id/stats', common, async (req, res) => {
         const deliveryTimeAccumulator = deliveryTime.map((ts) => {
             const { createdAt, deliveredAt } = ts.dataValues;
 
-            return Math.floor(
-                (deliveredAt.getTime() - createdAt.getTime()) / 1000 / 60
-            );
+            return Math.floor((deliveredAt.getTime() - createdAt.getTime()) / 1000 / 60);
         });
 
         const averageDeliveryTime =
-            Math.floor(
-                deliveryTimeAccumulator.reduce((acc, val) => acc + val, 0) /
-                    deliveryTimeAccumulator.length
-            ) || null;
+            Math.floor(deliveryTimeAccumulator.reduce((acc, val) => acc + val, 0) / deliveryTimeAccumulator.length) ||
+            null;
 
         res.json({
             totalOrders,
@@ -160,9 +148,7 @@ router.put('/:id', put, async (req, res) => {
             message: err
         });
 
-    const courier = await Courier.findByPk(id).catch((err) =>
-        errorHandler(err)
-    );
+    const courier = await Courier.findByPk(id).catch((err) => errorHandler(err));
 
     if (!courier)
         res.status(404).json({

@@ -2,6 +2,6 @@
 
 npm run drop
 npm run migration
-npm run generation
+npm run fixture-generation
 
-node app.js
+node index.js

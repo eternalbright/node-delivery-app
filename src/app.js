@@ -5,7 +5,7 @@ const helmet = require('helmet');
 const logger = require('morgan');
 const swaggerUi = require('swagger-ui-express');
 
-const swaggerReference = require('./swagger.json');
+const swaggerReference = require('../swagger.json');
 
 const rateLimit = require('./middlewares/rateLimit');
 const validateRoute = require('./middlewares/validateRoute');
@@ -43,10 +43,6 @@ app.use(errors());
 app.use(validateRoute);
 app.use(validateBody);
 
-app.listen(port, () =>
-    console.info(
-        `Express started on port ${port} (env: "${env}", apiVersion: "${apiVersion}")`
-    )
-);
+app.listen(port, () => console.info(`Express started on port ${port} (env: "${env}", apiVersion: "${apiVersion}")`));
 
 module.exports = app;

@@ -2,7 +2,7 @@
     "name": "node-delivery-app",
     "version": "1.0.0",
     "description": "Simple Node.js delivery app",
-    "main": "app.js",
+    "main": "src/index.js",
     "dependencies": {
         "body-parser": "1.19.0",
         "celebrate": "12.1.1",
@@ -21,7 +21,10 @@
     "devDependencies": {
         "eslint": "6.8.0",
         "eslint-plugin-jest": "23.8.2",
+        "ini": "1.3.6",
         "jest": "25.5.4",
+        "lodash": "4.17.19",
+        "node-notifier": "8.0.1",
         "nodemon": "2.0.3",
         "prettier": "2.0.5",
         "sequelize-cli": "5.5.1",
@@ -34,7 +37,7 @@
         "prod": "./run.sh prod",
         "migration": "npx sequelize db:migrate",
         "drop": "npx sequelize db:migrate:undo:all",
-        "generation": "./generateFixtures.js",
+        "fixture-generation": "src/fixtures/generateFixtures.js",
         "clean": "docker-compose down",
         "prettier": "prettier --write '**/*.js'"
     },

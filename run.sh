@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-case $1 in
+case "$1" in
     test)
         NODE_ENV=test npm run drop
         NODE_ENV=test npm run migration
@@ -17,8 +17,8 @@ case $1 in
     *)
         npm run drop
         npm run migration
-        npm run generation
+        npm run fixture-generation
 
-        nodemon app.js
+        nodemon index.js
     ;;
 esac

@@ -1,6 +1,6 @@
 const { Router } = require('express');
 
-const { Customer, Order } = require('../models/define');
+const { Customer, Order } = require('../models');
 const { common, getAll, post, put } = require('../schemas/customer');
 
 const router = Router();
@@ -17,9 +17,7 @@ router.get('/', getAll, async (req, res) => {
             message: err
         });
 
-    const { count } = await Customer.findAndCountAll().catch((err) =>
-        errorHandler(err)
-    );
+    const { count } = await Customer.findAndCountAll().catch((err) => errorHandler(err));
 
     if (!count)
         res.json({
@@ -88,9 +86,7 @@ router.put('/:id', put, async (req, res) => {
             message: err
         });
 
-    const customer = await Customer.findByPk(id).catch((err) =>
-        errorHandler(err)
-    );
+    const customer = await Customer.findByPk(id).catch((err) => errorHandler(err));
 
     if (!customer)
         res.status(404).json({

@@ -1,13 +1,7 @@
 const { join } = require('path');
 const Sequelize = require('sequelize');
 
-const {
-    NODE_ENV,
-    POSTGRES_HOST,
-    POSTGRES_DB,
-    POSTGRES_USER,
-    POSTGRES_PASSWORD
-} = process.env;
+const { NODE_ENV, POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD } = process.env;
 
 let connection;
 

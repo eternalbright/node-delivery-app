@@ -1,6 +1,6 @@
 const { Router } = require('express');
 
-const { Order, Restaurant } = require('../models/define');
+const { Order, Restaurant } = require('../models');
 const { common, getAll, post, put } = require('../schemas/restaurant');
 
 const router = Router();
@@ -17,9 +17,7 @@ router.get('/', getAll, async (req, res) => {
             message: err
         });
 
-    const { count } = await Restaurant.findAndCountAll().catch((err) =>
-        errorHandler(err)
-    );
+    const { count } = await Restaurant.findAndCountAll().catch((err) => errorHandler(err));
 
     if (!count)
         res.json({
@@ -88,9 +86,7 @@ router.put('/:id', put, async (req, res) => {
             message: err
         });
 
-    const restaurant = await Restaurant.findByPk(id).catch((err) =>
-        errorHandler(err)
-    );
+    const restaurant = await Restaurant.findByPk(id).catch((err) => errorHandler(err));
 
     if (!restaurant)
         res.status(404).json({

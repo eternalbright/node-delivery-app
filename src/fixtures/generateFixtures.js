@@ -3,8 +3,8 @@
 const { loadFixtures } = require('sequelize-fixtures');
 const { name, address, company } = require('faker');
 
-const models = require('./models/define');
-const extraFixtures = require('./fixtures/prod');
+const models = require('../models');
+const extraFixtures = require('./prod.json');
 
 (function () {
     let data = [];
@@ -22,8 +22,7 @@ const extraFixtures = require('./fixtures/prod');
     }
 
     function getRandomEntities(city) {
-        const search = (arr, model) =>
-            arr.filter((i) => i.model === model && i.data.city === city);
+        const search = (arr, model) => arr.filter((i) => i.model === model && i.data.city === city);
 
         const couriersInCity = search(data, 'Courier');
         const customersInCity = search(data, 'Customer');
@@ -72,9 +71,7 @@ const extraFixtures = require('./fixtures/prod');
             for (let id = 1; id <= 200; id++) {
                 const city = getRandomValue(cities);
 
-                const { Courier, Customer, Restaurant } = getRandomEntities(
-                    city
-                );
+                const { Courier, Customer, Restaurant } = getRandomEntities(city);
 
                 data.push({
                     id,
@@ -88,10 +85,7 @@ const extraFixtures = require('./fixtures/prod');
                         district: Restaurant.data.district,
                         restaurantId: Restaurant.id,
                         isDelivered: true,
-                        deliveredAt: new Date(
-                            new Date().getTime() +
-                                Math.floor(Math.random() * 10000) * 500
-                        )
+                        deliveredAt: new Date(new Date().getTime() + Math.floor(Math.random() * 10000) * 500)
                     }
                 });
             }

@@ -1,7 +1,7 @@
-const Courier = require('../models/Courier');
-const Customer = require('../models/Customer');
-const Order = require('../models/Order');
-const Restaurant = require('../models/Restaurant');
+const Courier = require('./Courier');
+const Customer = require('./Customer');
+const Order = require('./Order');
+const Restaurant = require('./Restaurant');
 
 Order.belongsTo(Courier, { as: 'Courier', foreignKey: 'courierId' });
 Order.belongsTo(Customer, { as: 'Customer', foreignKey: 'customerId' });

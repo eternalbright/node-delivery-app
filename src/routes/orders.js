@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { Sequelize } = require('sequelize');
 
-const { Courier, Customer, Order, Restaurant } = require('../models/define');
+const { Courier, Customer, Order, Restaurant } = require('../models');
 const { common, getAll, post, put } = require('../schemas/order');
 
 const router = Router();
@@ -18,9 +18,7 @@ router.get('/', getAll, async (req, res) => {
             message: err
         });
 
-    const { count } = await Order.findAndCountAll().catch((err) =>
-        errorHandler(err)
-    );
+    const { count } = await Order.findAndCountAll().catch((err) => errorHandler(err));
 
     if (!count)
         res.json({
