@@ -23,7 +23,7 @@
         "eslint-plugin-jest": "23.8.2",
         "ini": "1.3.6",
         "jest": "25.5.4",
-        "lodash": "4.17.19",
+        "lodash": "4.17.21",
         "node-notifier": "8.0.1",
         "nodemon": "2.0.3",
         "prettier": "2.0.5",
